@@ -161,6 +161,10 @@ kramdown:
     block:
       line_numbers: true
       start_line: 1
+  ## Adding 兼容 Jekyll 的 MathJax
+  kramdown:
+  math_engine: mathjax
+
 
 collections:
   tabs:
