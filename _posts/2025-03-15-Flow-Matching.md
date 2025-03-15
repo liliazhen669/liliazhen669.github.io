@@ -118,13 +118,14 @@ $$
 \mathcal{L}_\mathrm{CFM}(\theta)=\mathbb{E}_{t,q(x_1),p_t(x|x_1)}||v_t(x)-u_t(x|x_1)||^2
 $$
 
-并且证明了下面这个损失函数与原本损失函数的等价性，即作者证明了 
-$\mathcal{L}_{CFM}$ 和 $\mathcal{L}_{FM}$ 的等价性，也就是说优化 
-$\mathcal{L}_{CFM}$ 等价于优化 $\mathcal{L}_{FM}$，可以用如下定理来描述：
+并且证明了下面这个损失函数与原本损失函数的等价性，即作者证明了 $\mathcal{L}_{CFM}$ 
+和 $\mathcal{L}_{FM}$ 的等价性，也就是说优化 $\mathcal{L}_{CFM}$ 
+等价于优化 $\mathcal{L}_{FM}$，可以用如下定理来描述：
+
+$\theta$
 
 **定理二：**假定对于所有 $x\in\mathbb{R}^d$ 且 $t\in[0,1]$ 
-都有 $p_t(x)>0$，那么 $\mathcal{L}_{CFM}$ 和 
-$\mathcal{L}_\mathrm{FM}$
+都有 $p_t(x)>0$，那么 $\mathcal{L}_{CFM}$ 和 $\mathcal{L}_\mathrm{FM}$ 
 相差一个与 $\theta$ 无关的常数，即有 $\nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta)$。
 
 **证明：**首先把两个二次项都展开，然后证明右侧是相等的。注意，虽然右侧都有 
