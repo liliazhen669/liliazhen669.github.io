@@ -119,8 +119,8 @@ $$
 $$
 
 并且证明了下面这个损失函数与原本损失函数的等价性，即作者证明了 $\mathcal{L}_{CFM}$ 
-和 $\mathcal{L}_{FM}$ 的等价性，也就是说优化 $\mathcal{L}_{CFM}$ 
-等价于优化 $\mathcal{L}_{FM}$，可以用如下定理来描述：
+和 $\mathcal{L}_{FM}$ 的等价性，也就是说优化 
+$\mathcal{L}_{CFM}$ 等价于优化 $\mathcal{L}_{FM}$，可以用如下定理来描述：
 
 $\theta$
 
