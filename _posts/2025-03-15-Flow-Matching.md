@@ -5,7 +5,9 @@ date: 2025-03-15 17:00:00 +0800
 categories: [Learning, Diffusion Model]
 tags: [flow matching] # TAG names should always be lowercas
 render_with_liquid: false
+math: true
 ---
+
 
 > 论文链接：*[Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747)*
 
@@ -38,7 +40,7 @@ Normalizing Flows(NFs)是一种可逆的概率密度变换方法，其通过一�
 $$
 \frac{\mathrm{d}\mathbf{z}_t}{\mathrm{d}t}=v(\mathbf{z}_t,t)
 $$
-其中 $t\in[0,1]$，$\mathbf{z}_t$ 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
+其中 \( t\in[0,1] \)，\(\mathbf{z}_t \) 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
 $$
 \mathbf{z}_{t+\Delta t}=\mathbf{z}_t+\Delta t\cdot v(\mathbf{z}_t,t)
 $$
@@ -50,7 +52,7 @@ $$
 $$
 \frac{\partial p_t(\mathbf{x})}{\partial t}+\mathrm{div}(p_t(\mathbf{x})v_t(\mathbf{x}))=0
 $$
-其中 $p_t(\mathbf{x})$ 是时刻 $t$ 对应的概率密度函数、$v_t(\mathbf{x})$ 是与 $p_t(\mathbf{x})$ 关联的向量场。这个式子是向量场 $v_t(\mathbf{x})$ 能够产生概率密度路径 $p_t(\mathbf{x})$ 的充分必要条件，在后续的推导中会用这个式子作为一个约束来使用。
+其中 \( p_t(\mathbf{x}) \) 是时刻 $t$ 对应的概率密度函数、$v_t(\mathbf{x})$ 是与 \( p_t(\mathbf{x}) \) 关联的向量场。这个式子是向量场 \( v_t(\mathbf{x}) \) 能够产生概率密度路径 \( p_t(\mathbf{x}) \) 的充分必要条件，在后续的推导中会用这个式子作为一个约束来使用。
 
 ## Flow Matching
 
@@ -58,13 +60,13 @@ Flow Matching 的训练目标和 Score Matching 是比较类似的，学习的�
 $$
 \mathcal{L}_\mathrm{FM}(\theta)=\mathbb{E}_{t,p_t(x)}||v_t(x)-u_t(x)||^2
 $$
-其中 $\theta$ 是模型的可训练参数，$t$ 在 0 到 1 之间均匀分布，$x\sim p_t(x)$ 是概率路径，$v_t(x)$ 是由模型表示的向量场。从上式中可以知道，Flow Matching 目标的核心是最小化这个损失函数，使得它预测的向量场 $v_t(x)$ 尽可能接近于实际的向量场 $u_t(x)$
+其中 $\theta$ 是模型的可训练参数，$t$ 在 0 到 1 之间均匀分布，$x\sim p_t(x)$ 是概率路径，$v_t(x)$ 是由模型表示的向量场。从上式中可以知道，Flow Matching 目标的核心是最小化这个损失函数，使得它预测的向量场 $v_t(x)$ 尽可能接近于实际的向量场 \(u_t(x) \)
 
-，从而能够准确地生成目标概率路径 $p_t$。尽管训练目标很直观，但由于不知道如何确定合适的 $p_t(x)$ 和 $u_t(x)$，因此无法直接使用，为了解决这个问题，在原论文中提出并证明了三条定理，以及提出了Conditional Flow Matching来解决这个问题
+，从而能够准确地生成目标概率路径 $p_t$。尽管训练目标很直观，但由于不知道如何确定合适的 \( p_t(x) \) 和 \( u_t(x) \)，因此无法直接使用，为了解决这个问题，在原论文中提出并证明了三条定理，以及提出了Conditional Flow Matching来解决这个问题
 
-**定理一：**给定向量场 $u_t(x|x_1)$，其能够生成条件概率路径 $p_t(x|x_1)$，那么对于任意分布 $q(x_1)$，满足某一特定形式（后文会给出）的边缘向量场 $u_t(x)$ 就能生成对应的边缘概率路径 $p_t(x)$。
+**定理一：**给定向量场 \(u_t(x|x_1) \)，其能够生成条件概率路径 \(p_t(x|x_1) \)，那么对于任意分布 \(q(x_1) \)，满足某一特定形式（后文会给出）的边缘向量场 \(u_t(x) \) 就能生成对应的边缘概率路径 \( p_t(x) \)。
 
-**证明：**首先，对于边缘概率路径 $p_t(x)$，有以下等式：
+**证明：**首先，对于边缘概率路径 \( p_t(x) \)，有以下等式：
 $$
 p_t(x)=\int p_t(x|x_1)q(x_1)\mathrm{d}x_1
 $$
@@ -81,19 +83,19 @@ $$
 $$
 \frac{\mathrm{d}}{\mathrm{d}t}p_t(x)=-\mathrm{div}\left(u_t(x)p_t(x)\right)
 $$
-两个式子联立得到 $u_t(x)$ 需要满足以下形式：
+两个式子联立得到 \( u_t(x) \) 需要满足以下形式：
 $$
 u_t(x)=\int u_t(x|x_1)\frac{p_t(x|x_1)q(x_1)}{p_t(x)}\mathrm{d}x_1
 $$
-也就是说，只要 $u_t(x)$ 满足上边等式中的形式，就可以用 $u(x|x_1)$ 和 $p(x|x_1)$ 取代 $u(x)$ 和 $p(x)$。
+也就是说，只要 \( p_t(x) \) 满足上边等式中的形式，就可以用 \(u(x|x_1) \) 和 \(p(x|x_1) \) 取代 \( u(x) \) 和 \( p(x) \)。
 
-虽然基于上述过程已经推导出了 $u_t(x)$ 的形式，但上述的积分依然不容易求解。因此作者给出了一种更容易求解的形式（如下所示），
+虽然基于上述过程已经推导出了 \( u_t(x) \) 的形式，但上述的积分依然不容易求解。因此作者给出了一种更容易求解的形式（如下所示），
 $$
 \mathcal{L}_\mathrm{CFM}(\theta)=\mathbb{E}_{t,q(x_1),p_t(x|x_1)}||v_t(x)-u_t(x|x_1)||^2
 $$
-并且证明了下面这个损失函数与原本损失函数的等价性，即作者证明了 $\mathcal{L}_{CFM}$ 和 $\mathcal{L}_{FM}$ 的等价性，也就是说优化 $\mathcal{L}_{CFM}$ 等价于优化 $\mathcal{L}_{FM}$，可以用如下定理来描述：
+并且证明了下面这个损失函数与原本损失函数的等价性，即作者证明了 \(\mathcal{L}_{CFM} \) 和 \(\mathcal{L}_{FM} \) 的等价性，也就是说优化 \(\mathcal{L}_{CFM} \) 等价于优化 \(\mathcal{L}_{FM} \)，可以用如下定理来描述：
 
-**定理二：**假定对于所有 $x\in\mathbb{R}^d$ 且 $t\in[0,1]$ 都有 $p_t(x)>0$，那么 $\mathcal{L}_{CFM}$ 和 $\mathcal{L}_\mathrm{FM}$ 相差一个与 $\theta$ 无关的常数，即有 $\nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta)$。
+**定理二：**假定对于所有 $x\in\mathbb{R}^d$ 且 \(t\in[0,1] \) 都有 \(p_t(x)>0 \)，那么 \( \mathcal{L}_{CFM} \) 和 \( \mathcal{L}_\mathrm{FM} \) 相差一个与 $\theta$ 无关的常数，即有 \( \nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta) \)。
 
 **证明：**首先把两个二次项都展开，然后证明右侧是相等的。注意，虽然右侧都有 $\left\Vert v_t(x)\right\Vert^2$ 这一项，但由于 $\mathbb{E}$ 的下标不一样，所以不能直接认为两者相等。
 $$
@@ -145,7 +147,7 @@ $$
 $$
 在上边的式子里，$\psi_t$ 的形式是已知的，并且 $x_0\sim\mathcal{N}(0,I)$，所以上边的式子是可以求解的，是实用、可以实现的损失函数。同时，也可以得到条件向量场的形式，即：
 
-**定理三：**令 $p_t(x|x_1)$ 是上述的高斯概率路径，$\psi_t$ 是上述的 flow map，那么 $\psi_t(x)$ 对应于唯一的向量场 $u_t(x|x_1)$，且形式为：
+**定理三：**令 \(p_t(x|x_1) \) 是上述的高斯概率路径，$\psi_t$ 是上述的 flow map，那么 $\psi_t(x)$ 对应于唯一的向量场 \( u_t(x|x_1) \)，且形式为：
 $$
 u(x|x_1)=\frac{\sigma'_t(x_1)}{\sigma_t(x_1)}(x-\mu(x_1))+\mu'_t(x_1)
 $$
@@ -169,9 +171,9 @@ $$
 
 Flow Matching 定义了一种特定形式的高斯概率路径，当选择不同的均值和方差时，有几种特殊的情况：
 
-- Variance Exploding: $p_t(x)=\mathcal{N}(x|x_1,\sigma_{1-t}^2I)$，其中 $\mu_t(x_1)=x_1$、$\sigma_t(x_1)=\sigma_{1-t}$，并且 $\sigma_t$ 是递增函数，$\sigma_0=0$、$\sigma_1\gg1$。这种过程能够使模型生成数据时探索范围更广的空间，有助于生成多样的样本。
-- Variance Preserving: $p_t(x|x_1)=\mathcal{N}(x|\alpha_{1-t}x_1,(1-\alpha_{1-t}^2)I)$，其中 $\mu_t(x_1)=\alpha_{1-t}x_1$、$\sigma_t(x_1)=\sqrt{1-\alpha_{1-t}^2}$。这种过程在引入噪声的同时保持整体方差不变，这样能使数据的分布比较稳定。（可以看出 DDPM 就是这种过程）
-- Optimal Transport Conditional: 定义均值和方差为 $\mu_t(x)=tx_1$、$\sigma_t(x)=1-(1-\sigma_\min)t$。可以求得最优传输路径是直线，因此可以更快地训练和采样。（这个比较类似于 Rectified Flow）
+- Variance Exploding: \(p_t(x)=\mathcal{N}(x|x_1,\sigma_{1-t}^2I) \)，其中 $\mu_t(x_1)=x_1$、$\sigma_t(x_1)=\sigma_{1-t}$，并且 $\sigma_t$ 是递增函数，$\sigma_0=0$、$\sigma_1\gg1$。这种过程能够使模型生成数据时探索范围更广的空间，有助于生成多样的样本。
+- Variance Preserving: \(p_t(x|x_1)=\mathcal{N}(x|\alpha_{1-t}x_1,(1-\alpha_{1-t}^2)I) \)，其中 $\mu_t(x_1)=\alpha_{1-t}x_1$、$\sigma_t(x_1)=\sqrt{1-\alpha_{1-t}^2}$。这种过程在引入噪声的同时保持整体方差不变，这样能使数据的分布比较稳定。（可以看出 DDPM 就是这种过程）
+- Optimal Transport Conditional: 定义均值和方差为 \( \mu_t(x)=tx_1 \)、$\sigma_t(x)=1-(1-\sigma_\min)t$。可以求得最优传输路径是直线，因此可以更快地训练和采样。（这个比较类似于 Rectified Flow）
 
 # Summary
 
