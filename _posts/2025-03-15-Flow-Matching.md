@@ -42,7 +42,7 @@ $$
 \frac{\mathrm{d}\mathbf{z}_t}{\mathrm{d}t}=v(\mathbf{z}_t,t) 
 $$
 
-其中 \$$t\in[0,1]$$，\$$ \mathbf{z}_t $$ 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
+其中 $t \in [0,1],\mathbf{z}_t$ 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
 
 $$ \mathbf{z}_{t+\Delta t}=\mathbf{z}_t+\Delta t\cdot v(\mathbf{z}_t,t) $$
 
@@ -54,16 +54,21 @@ $$ \mathbf{z}_{t+\Delta t}=\mathbf{z}_t+\Delta t\cdot v(\mathbf{z}_t,t) $$
 $$
 \frac{\partial p_t(\mathbf{x})}{\partial t}+\mathrm{div}(p_t(\mathbf{x})v_t(\mathbf{x}))=0
 $$
-其中 \( p_t(\mathbf{x}) \) 是时刻 $t$ 对应的概率密度函数、$v_t(\mathbf{x})$ 是与 \( p_t(\mathbf{x}) \) 关联的向量场。这个式子是向量场 \( v_t(\mathbf{x}) \) 能够产生概率密度路径 \( p_t(\mathbf{x}) \) 的充分必要条件，在后续的推导中会用这个式子作为一个约束来使用。
+
+其中 $p_t\left(\mathbf{x}\right)$
+是时刻 $t$ 对应的概率密度函数、$v_t(\mathbf{x})$ 是与 $p_t(\mathbf{x})$ 关联的向量场。这个式子是向量场
+$v_t(\mathbf{x})$ 能够产生概率密度路径  $p_t(\mathbf{x})$ 的充分必要条件，在后续的推导中会用这个式子作为一个约束来使用。
 
 ## Flow Matching
 
 Flow Matching 的训练目标和 Score Matching 是比较类似的，学习的目标就是通过学习拟合一个向量场 $u_t$，使得能够得到对分布进行变换的概率路径 $p_t$，也就是下边这个公式：
+
 $$
 \mathcal{L}_\mathrm{FM}(\theta)=\mathbb{E}_{t,p_t(x)}||v_t(x)-u_t(x)||^2
 $$
-其中 $\theta$ 是模型的可训练参数，$t$ 在 0 到 1 之间均匀分布，$x\sim p_t(x)$ 是概率路径，$v_t(x)$ 是由模型表示的向量场。从上式中可以知道，Flow Matching 目标的核心是最小化这个损失函数，使得它预测的向量场 $v_t(x)$ 尽可能接近于实际的向量场 \(u_t(x) \)
 
+其中 $\theta$ 是模型的可训练参数，$t$ 在 0 到 1 之间均匀分布，$x\sim p_t(x)$ 是概率路径，$v_t(x)$ 是由模型表示的向量场。从上式中可以知道，Flow Matching 目标的核心是最小化这个损失函数，使得它预测的向量场 $v_t(x)$
+尽可能接近于实际的向量场 $u_t \left ( x \right )$ 
 ，从而能够准确地生成目标概率路径 $p_t$。尽管训练目标很直观，但由于不知道如何确定合适的 \( p_t(x) \) 和 \( u_t(x) \)，因此无法直接使用，为了解决这个问题，在原论文中提出并证明了三条定理，以及提出了Conditional Flow Matching来解决这个问题
 
 **定理一：**给定向量场 \(u_t(x|x_1) \)，其能够生成条件概率路径 \(p_t(x|x_1) \)，那么对于任意分布 \(q(x_1) \)，满足某一特定形式（后文会给出）的边缘向量场 \(u_t(x) \) 就能生成对应的边缘概率路径 \( p_t(x) \)。
