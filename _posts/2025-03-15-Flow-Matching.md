@@ -37,13 +37,15 @@ Normalizing Flows(NFs)是一种可逆的概率密度变换方法，其通过一�
 ## Continuous Normalizing Flow
 
 简单来说，Continuous Normalizing Flow（CNF）是 Normalizing Flow 的连续形式，CNF通常用常微分方程（ODE）来表示：
+
 $$
-\frac{\mathrm{d}\mathbf{z}_t}{\mathrm{d}t}=v(\mathbf{z}_t,t)
+\frac{\mathrm{d}\mathbf{z}_t}{\mathrm{d}t}=v(\mathbf{z}_t,t) 
 $$
-其中 \( t\in[0,1] \)，\(\mathbf{z}_t \) 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
-$$
-\mathbf{z}_{t+\Delta t}=\mathbf{z}_t+\Delta t\cdot v(\mathbf{z}_t,t)
-$$
+
+其中 \$$t\in[0,1]$$，\$$ \mathbf{z}_t $$ 称为**Flow Map**,或者**Transport Map**,可以理解为时刻 $t$ 下的数据点，$v(\mathbf{z}_t,t)$ 是一个向量场(Vector Field)，定义了每个数据点在状态空间中时刻 $t$ 下的变化大小与方向，通常由神经网络来学习。当神经网络完成了对向量场 $v(\mathbf{z}_t,t)$ 的学习后，就可以用如下的欧拉方法来求解：
+
+$$ \mathbf{z}_{t+\Delta t}=\mathbf{z}_t+\Delta t\cdot v(\mathbf{z}_t,t) $$
+
 这意味着，给定一个初始概率分布（通常是标准高斯分布），可以通过学习向量场来学习数据的变换过程，从标准高斯分布采样，然后通过上述迭代过程得到目标分布中的一个近似解，完成生成的过程，从而实现从简单概率分布得到目标概率分布
 
 ## Continuity Equation
