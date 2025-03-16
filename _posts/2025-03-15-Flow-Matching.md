@@ -6,7 +6,6 @@ categories: [Learning, Diffusion Model]
 tags: [flow matching] # TAG names should always be lowercas
 render_with_liquid: false
 math: true
-usemath: Latex
 ---
 
 
