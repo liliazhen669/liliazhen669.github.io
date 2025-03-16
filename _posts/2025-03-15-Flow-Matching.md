@@ -125,7 +125,8 @@ $\mathcal{L}_{CFM}$ 等价于优化 $\mathcal{L}_{FM}$，可以用如下定理�
 $\theta$
 
 **定理二：**假定对于所有 $x\in\mathbb{R}^d$ 且 $t\in[0,1]$ 
-都有 $p_t(x)>0$，那么 $\mathcal{L}_{CFM}$ 和 $\mathcal{L}_\mathrm{FM}$ 
+都有 $p_t(x)>0$，那么 $\mathcal{L}_{CFM}$ 
+和 $\mathcal{L}_\mathrm{FM}$ 
 相差一个与 $\theta$ 无关的常数，即有 $\nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta)$。
 
 **证明：**首先把两个二次项都展开，然后证明右侧是相等的。注意，虽然右侧都有 
