@@ -131,7 +131,9 @@ $$
 
 和 $\mathcal{L}_\mathrm{FM}$ 
 
-相差一个与 $\theta$ 无关的常数，即有 $\nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta)$。
+相差一个与 $\theta$ 无关的常数，即有 
+
+$\nabla_\theta\mathcal{L}_\mathrm{FM}(\theta)=\nabla_\theta\mathcal{L}_\mathrm{CFM}(\theta)$。
 
 **证明：**首先把两个二次项都展开，然后证明右侧是相等的。注意，虽然右侧都有 
 $\left\Vert v_t(x)\right\Vert^2$ 这一项，但由于 
