@@ -47,7 +47,7 @@ $x_{t}$，使得在给定 $(x_{0}, x_{1})$ 的情况下,
 $x_{t}$ 的条件分布 $\pi(x_{t}|x_{0},x_{1})$ 本质上是一个布朗运动（也称为布朗桥），插值公式如下表示：
 
 $$
-x_{t} = (1-t)x_{0}+tx_{1}+\sigma\sqrt_{t(1-t)}\epsilon
+x_{t} = (1-t)x_{0}+tx_{1}+\sigma\sqrt{t(1-t)}\epsilon
 $$
 
 其中，$\epsilon \sim \mathcal{N}(0,I)$，$\sigma \ge 0$, 且 $t\in[0,1]$。值得注意的是，如果进一步设 $\sigma=0$，就可以得到流匹配公式，其可被视为Bridge Matching的零噪声极限。因此，$x_{t}$ 随时间的演化由以下随机微分方程（SDE）给出:
