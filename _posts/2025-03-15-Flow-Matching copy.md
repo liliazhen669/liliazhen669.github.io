@@ -11,7 +11,7 @@ math: true
 
 > 论文链接：*[Flow Matching for Generative Modeling](https://arxiv.org/abs/2210.02747)*
 
-前几天看到了一篇Latent Bridge Diffusion的工作，感觉在Relighting方面的效果很惊艳，追溯了一下原理后发现又来到了Flow Matching这个概念，由于之前了解Stable Diffusion 3的时候接触过这个概念，但没有深入了解，现特意来学习Flow Matching
+前几天看到了一篇Latent Bridge Matching的工作，感觉在Relighting方面的效果很惊艳，追溯了一下原理后发现又来到了Flow Matching这个概念，由于之前了解Stable Diffusion 3的时候接触过这个概念，但没有深入了解，现特意来学习Flow Matching
 
 # Flow Matching
 
