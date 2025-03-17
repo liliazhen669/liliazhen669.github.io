@@ -58,3 +58,14 @@ $$
 $$
 
 最后，估计出的漂移函数 $v_{\theta}$ 可以被整合到标准的随机微分方程求解器中，用于求解SDE，从而从分布 $\pi_{0}$ 中抽取的初始样本 $x_{0}$ 出发，生成服从分布 $\pi_{1}$ 的样本 $x_{1}$ 。
+
+
+省流版：
+
+<p align="center">
+  <img src="https://pic2.zhimg.com/v2-36b446a24c73dec62a8754c2525f9943_1440w.jpg" alt="LBM Teaser" width="800"/>
+</p>
+
+<p align="center">
+  <img src="https://picx.zhimg.com/v2-57d314e3c3f85b362586d8c903ebfbd3_1440w.jpg" alt="LBM Teaser" width="800"/>
+</p>
