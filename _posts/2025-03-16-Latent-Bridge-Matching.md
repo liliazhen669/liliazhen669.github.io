@@ -3,7 +3,7 @@ title: Latent Bridge Matching for Fast Image-to-Image Translation
 author: liliazhen669
 date: 2025-03-16 16:00:00 +0800
 categories: [Learning, Generative Models]
-tags: [LBM] # TAG names should always be lowercas
+tags: [paper] # TAG names should always be lowercas
 render_with_liquid: false
 math: true
 ---

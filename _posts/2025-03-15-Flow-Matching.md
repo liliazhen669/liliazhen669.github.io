@@ -2,8 +2,8 @@
 title: Flow Matching 理论学习
 author: liliazhen669
 date: 2025-03-15 17:00:00 +0800
-categories: [Learning, Diffusion Model]
-tags: [flow matching] # TAG names should always be lowercas
+categories: [Learning, Generative Models]
+tags: [method] # TAG names should always be lowercas
 render_with_liquid: false
 math: true
 ---
