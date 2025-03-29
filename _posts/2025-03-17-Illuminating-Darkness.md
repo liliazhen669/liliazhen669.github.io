@@ -1,5 +1,5 @@
 ---
-title: LumiNet-Latent Intrinsics Meets Diffusion Models for Indoor Scene Relighting
+title: Latent Intrinsics Meets Diffusion Models for Indoor Scene Relighting
 author: liliazhen669
 date: 2025-03-18 18:00:00 +0800
 categories: [Learning, Relighting]
