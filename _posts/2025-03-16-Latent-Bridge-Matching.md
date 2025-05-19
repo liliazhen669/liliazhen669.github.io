@@ -87,15 +87,23 @@ $$
 
 ### Training detail
 
-现假设有两个图像分布 $\pi_{0}$ 和 $\pi_{1}$，现想要将样本从 $\pi_{0}$ 转移到 $\pi_{1}$。训练过程如下：首先，抽出一对样本数 （x0，x1） ∼ π0 ×π1.然后，这些样本将 en
-使用预先训练的 VAE 给出
-相应的潜在值 z0 和 z1。绘制时间步长 t
-从 π（t） 开始，使用方程 （5） 创建时间步长分布和噪声样本 zt。然后，此示例将传递给
-降噪器 vθ（zt，t） 它另外用 re 调节
-spect 设置为时间步长 t 并预测漂移。值得注意的是，一个
-可使用
+现假设有两个图像分布 $\pi_{0}$ 和 $\pi_{1}$，现想要将样本从 $\pi_{0}$ 转移到 $\pi_{1}$。训练过程如下：首先，抽出一对样本数 $x0，x1） ∼ \pi_{0} \times \pi_{1}$。然后这些样本将被预先训练的 VAE 给出编码到相应的潜变量 $z_{0}$ 和 $z_{1}$。从 $\pi(t)$ 得到时间步长 $t$ ，使用方程（5）得到时间步分布和噪声样本 $z_{t}$。然后将此样本，即将 $z_{t}$ 传递给降噪器 $v_{\theta}(z_{t}，t)$，该降噪器会根据时间步 $t$ 进行额外调节并预测 *drift* 。值得注意的是，可以很容易地根据预测的 *drift* 得到相应预测潜在变量 $z_{1}$：
+$$
+\begin{equation}
+\hat{z_{1}} = (1-t)\cdots v_{\theta}(z_{t}，t) + z_{t}.
+\end{equation}
+$$
+在训练期间，作者还引入了一个像素损失像素。损失包括解码估计的目标潜在 $x_{1}= \mathcal{D}(z_{1})$，其中 $\mathcal{D}$ 是 VAE 的解码器，并将其与实际
+目标图像 $x_{1}$。损失函数有多种选择，例如 L1、L2 或 LPIPS 。作者发现 LPIPS 在实践中效果很好，可以加速域转移。为了随图像大小缩放，作者制定了随机裁剪策略，并且仅在图像大小大于特定阈值时计算patch上的损失。这限制了模型的内存占用，因此它不会成为训练效率的负担。最终目标可以总结如下：
+$$
+\begin{equation}
+\mathcal{L}=\mathcal{L}_{\mathrm{LBM}}(\mathcal{E}(x_{0}),\mathcal{E}(x_{1}))+\lambda\cdot\mathcal{L}_{\mathrm{pixel}}(\widehat{x}_{1},x_{1}).
+\end{equation}
+$$
+作者在图 2 中提供了条件设置中建议的方法。为了便于说明，作者选择了可控阴影生成的上下文，其中生成进一步受到指示光源位置的光照贴图 $c$ 的限制源。在此设置中，$\pi_{0}$ 对应于与无阴影图像关联的潜在分布，而 $\pi_{1}$ 是与有阴影的图像关联的潜在分布。在训练过程中，可以通过沿通道维度连接潜在变量 $z_{t}$ 来将条件变量 $c$ 注入降噪器 $v_{\theta}$。
 
-整个用于训练的模型由一个类 LBModel实现，而训练的逻辑主要在其前向函数 forward中实现：
+
+下面是代码实现部分，整个用于训练的模型由一个类 LBModel实现，而训练的逻辑主要在其前向函数 forward中实现：
 
 首先是采样时间步以及其变量 $\sigma$：
 
@@ -140,7 +148,20 @@ def _timestep_sampling(self, n_samples=1, device="cpu"):
 随后是创建方程 $x_{t} = (1-t)x_{0}+tx_{1}+\sigma\sqrt{t(1-t)}\epsilon$：
 
 ```python
+# Get inputs/latents
+## z: target_key, while z_source:source_key
+if self.vae is not None:
+    vae_inputs = batch[self.target_key]
+    z = self.vae.encode(vae_inputs)
+    downsampling_factor = self.vae.downsampling_factor
+else:
+    z = batch[self.target_key]
 
+if self.vae is not None:
+    z_source = self.vae.encode(source_image)
+
+else:
+    z_source = source_image
 ## _get_sigmas函数实际是返回一个和latent维度相同的sigma
 def _get_sigmas(
     self, scheduler, timesteps, n_dim=4, dtype=torch.float32, device="cpu"
@@ -160,13 +181,8 @@ sigmas = self._get_sigmas(
     self.training_noise_scheduler, timestep, n_dim=4, device=z.device
 )
 
-noisy_sample = (
-    sigmas * z_source
-    + (1.0 - sigmas) * z
-    + self.bridge_noise_sigma
-    * (sigmas * (1.0 - sigmas)) ** 0.5
-    * torch.randn_like(z)
-)
+## 
+noisy_sample = (sigmas * z_source + (1.0 - sigmas) * z + self.bridge_noise_sigma * (sigmas * (1.0 - sigmas)) ** 0.5 * torch.randn_like(z))
 
 for i, t in enumerate(timestep):
     if t.item() == self.training_noise_scheduler.timesteps[0]:
