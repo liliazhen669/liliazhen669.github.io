@@ -66,6 +66,6 @@ $$
 \hat{\mathcal{E}}=\{\mathcal{E}_i(z_{rel}),\mathcal{E}_i(z_{bg}),\mathcal{E}_t(y),\mathcal{E}_e(E)\},
 \end{equation}
 $$
-其中，$\hat{E}$ 是关于输入视频、背景视频、环境图和CLIP嵌入的编码条件latent。
+其中，$\hat{\mathcal{E}}$ 是关于输入视频、背景视频、环境图和CLIP嵌入的编码条件latent。
 
 - 光照不变性集成（IIE）：为增强重照明的鲁棒性，论文还提出了一种光照不变性集成（Illumination-Invariant Ensemble, IIE）策略。该策略通过对输入视频施加多种亮度增强，生成多个增强版本，然后平均每个增强版本的噪声预测，以获取更可信的最终结果。这种方法可以显著减轻光照变化对重照明质量的影响。

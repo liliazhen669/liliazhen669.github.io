@@ -85,7 +85,109 @@ $$
 
 在推理时，可以使用来自 $\pi_{0}$ 的样本实现从分布 $\pi_{1}$ 中进行采样。具体而言，首先从 $\pi_{0}$ 中抽取一个样本，将其映射到潜在空间，使用标准随机微分方程 (SDE) 求解器，即求解公式 (2) 中的随机微分方程 (SDE)，然后使用 VAE 的解码器将潜在空间映射回图像空间。这种方法的优点是通过**降低数据的维度来大幅降低计算成本**，从而允许训练可扩展到高维数据（例如高分辨率图像）的模型。需要注意的是，计算来自 $\pi_{0}$ 或 $\pi_{1}$ 的任何样本相关的潜在空间可以在训练之前完成。类似于针对扩散模型提出的方法，可以推导出 LBM 的条件设置。在这种情况下，除了 $(x_0,x_1)$ 配对之外，还引入了一个额外的条件变量 $c$，它将进一步指导生成过程。因此， $v_{\theta}$ 是关于 $c$ 进行调节的，因此 $v_{\theta}(z_t,t,c)$ 也取决于条件变量 $c$。
 
+### Training detail
 
+现假设有两个图像分布 $\pi_{0}$ 和 $\pi_{1}$，现想要将样本从 $\pi_{0}$ 转移到 $\pi_{1}$。训练过程如下：首先，抽出一对样本数 （x0，x1） ∼ π0 ×π1.然后，这些样本将 en
+使用预先训练的 VAE 给出
+相应的潜在值 z0 和 z1。绘制时间步长 t
+从 π（t） 开始，使用方程 （5） 创建时间步长分布和噪声样本 zt。然后，此示例将传递给
+降噪器 vθ（zt，t） 它另外用 re 调节
+spect 设置为时间步长 t 并预测漂移。值得注意的是，一个
+可使用
+
+整个用于训练的模型由一个类 LBModel实现，而训练的逻辑主要在其前向函数 forward中实现：
+
+首先是采样时间步以及其变量 $\sigma$：
+
+```python
+## 采样时间步
+timestep = self._timestep_sampling(n_samples=z.shape[0], device=z.device)
+sigmas = None
+
+## _timestep_sampling函数实际上就是返回一个时间步timestep：
+## training_noise_scheduler 默认使用流匹配欧拉调度器：FlowMatchEulerDiscreteScheduler
+def _timestep_sampling(self, n_samples=1, device="cpu"):
+    if self.timestep_sampling == "uniform":
+        idx = torch.randint(
+            0,
+            self.training_noise_scheduler.config.num_train_timesteps,
+            (n_samples,),
+            device="cpu",
+        )
+        return self.training_noise_scheduler.timesteps[idx].to(device=device)
+
+    elif self.timestep_sampling == "log_normal":
+        u = torch.normal(
+            mean=self.logit_mean,
+            std=self.logit_std,
+            size=(n_samples,),
+            device="cpu",
+        )
+        u = torch.nn.functional.sigmoid(u)
+        indices = (
+            u * self.training_noise_scheduler.config.num_train_timesteps
+        ).long()
+        return self.training_noise_scheduler.timesteps[indices].to(device=device)
+
+    elif self.timestep_sampling == "custom_timesteps":
+        idx = np.random.choice(len(self.selected_timesteps), n_samples, p=self.prob)
+
+        return torch.tensor(
+            self.selected_timesteps, device=device, dtype=torch.long
+        )[idx]
+```
+
+随后是创建方程 $x_{t} = (1-t)x_{0}+tx_{1}+\sigma\sqrt{t(1-t)}\epsilon$：
+
+```python
+
+## _get_sigmas函数实际是返回一个和latent维度相同的sigma
+def _get_sigmas(
+    self, scheduler, timesteps, n_dim=4, dtype=torch.float32, device="cpu"
+):
+    sigmas = scheduler.sigmas.to(device=device, dtype=dtype)
+    schedule_timesteps = scheduler.timesteps.to(device)
+    timesteps = timesteps.to(device)
+    step_indices = [(schedule_timesteps == t).nonzero().item() for t in timesteps] ## 从schedule_timesteps中获取与timesteps有相等的值的索引列表
+
+    sigma = sigmas[step_indices].flatten() ## 展平
+    while len(sigma.shape) < n_dim:
+        sigma = sigma.unsqueeze(-1)
+    return sigma
+
+# Create interpolant
+sigmas = self._get_sigmas(
+    self.training_noise_scheduler, timestep, n_dim=4, device=z.device
+)
+
+noisy_sample = (
+    sigmas * z_source
+    + (1.0 - sigmas) * z
+    + self.bridge_noise_sigma
+    * (sigmas * (1.0 - sigmas)) ** 0.5
+    * torch.randn_like(z)
+)
+
+for i, t in enumerate(timestep):
+    if t.item() == self.training_noise_scheduler.timesteps[0]:
+        noisy_sample[i] = z_source[i]
+```
+
+最后是预测噪声和预测样本，以及损失函数：
+
+```python
+# 使用去噪器预测噪声
+prediction = self.denoiser(
+    sample=noisy_sample,
+    timestep=timestep,
+    conditioning=conditioning,
+    *args,
+    **kwargs,
+)
+
+target = z_source - z ## z_1 - z_t
+denoised_sample = noisy_sample - prediction * sigmas
+```
 
 ## Dataset
 
