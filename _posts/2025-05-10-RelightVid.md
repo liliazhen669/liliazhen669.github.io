@@ -46,14 +46,20 @@ RelightVid 的核心任务是实现**视频重光照**，即在保持视频内�
     背景视频和重光照视频：通过VAE编码器将背景视频和重光照视频编码到潜在空间。
     HDR环境图：通过5层MLP将HDR环境图编码为LDR和HDR特征。
     文本提示：通过CLIP文本编码器将文本提示编码为特征向量。
-- 条件注入：通过VAE编码器分别编码重照明视频（Vrel）和背景视频（Vbg），并将其 latent 表示（zrel 和 zbg）与添加的噪声结合，将编码后的条件特征通过交叉注意力机制注入到模型中，实现精确的光照控制。
+- 条件注入：通过VAE编码器分别编码重照明视频（$V_{rel}$）和背景视频（$V_{bg}$），并将其 latent 表示（$z_{rel}$ 和 $z_{bg}$）与添加的噪声结合，将编码后的条件特征通过交叉注意力机制注入到模型中，实现精确的光照控制。
 
 ### 训练与优化
 - 多模态条件联合训练：RelightVid的一个创新点是实现了多模态条件的联合训练。通过同时考虑背景条件和文本提示，可以实现更细粒度的光照控制。模型通过优化以下目标函数进行训练：
 $$
 \begin{equation}
-\min_{\theta} E_{z\sim E(x),t,\epsilon\sim N(0,1)} \| \epsilon - \epsilon_{\theta}(z_t, t, \hat{E}) \|^2_2
+\min_\theta\mathbb{E}_{z\sim\mathcal{E}(x),t,\epsilon\sim\mathcal{N}(0,1)}\|\epsilon-\epsilon_\theta(z_t,t,\hat{\mathcal{E}})\|_2^2,
 \end{equation}
-$$其中，$\hat{E}$ 是关于输入视频、背景视频、环境图和CLIP嵌入的编码条件latent。
+$$
+$$
+\begin{equation}
+\hat{\mathcal{E}}=\{\mathcal{E}_i(z_{rel}),\mathcal{E}_i(z_{bg}),\mathcal{E}_t(y),\mathcal{E}_e(E)\},
+\end{equation}
+$$
+其中，$\hat{E}$ 是关于输入视频、背景视频、环境图和CLIP嵌入的编码条件latent。
 
 - 光照不变性集成（IIE）：为增强重照明的鲁棒性，论文还提出了一种光照不变性集成（Illumination-Invariant Ensemble, IIE）策略。该策略通过对输入视频施加多种亮度增强，生成多个增强版本，然后平均每个增强版本的噪声预测，以获取更可信的最终结果。这种方法可以显著减轻光照变化对重照明质量的影响。
