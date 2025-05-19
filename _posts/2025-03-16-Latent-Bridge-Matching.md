@@ -14,6 +14,8 @@ math: true
 
 # Architexture
 
+![fig-1](assets/img/lbm/fig1.png)
+
 ## Abstract
 
 现有的扩散模型在img2img任务中需要多步才能达到比较好的效果，虽然已经有蒸馏或者流方法来加速采样过程，但是任然无法实现单步生成。因此，本文基于Latent Space 中的 Bridge Matching，来实现单步img2img
@@ -36,6 +38,8 @@ math: true
 - 条件扩展：引入光照图等条件输入，支持可控图像生成（如阴影位置、光源颜色）。
 
 ## Method
+
+![fig-1](assets/img/lbm/fig1.png)
 
 ### Bridge Matching
 
