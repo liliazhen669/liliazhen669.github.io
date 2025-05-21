@@ -38,7 +38,7 @@ math: true
 
 ### Blending shadows
 
-为了将引导阴影融入到隐表示中，需要将隐空间中每一时间步的噪声编码 $z_{t}$ 进行更新 (更新策略类似于[Blended latent diffusion 2023])：
+为了将引导阴影融入到隐表示中，需要将隐空间中每一时间步的噪声编码 $z_{t}$ 进行更新 (更新策略类似于(Blended latent diffusion 2023))：
 $$
 \mathbf{\tilde{z}}_t=(1-\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathbf{z}_t+(\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathrm{noise}(\mathcal{E}(\mathbf{g}),t)
 $$
@@ -54,4 +54,4 @@ $$
 
 ###  Final image synthesi
 
-引导扩散过程结束后，使用 VAE 解码器对生成的潜变量进行解码。采用 [Zerocomp:Zero-shot object compositing from image intrinsics via diffusion.] 中的背景保留策略，确保仅修改目标及其阴影，从而生成具有自然局部光照的合成图像。
+引导扩散过程结束后，使用 VAE 解码器对生成的潜变量进行解码。采用 (Zerocomp) 中的背景保留策略，确保仅修改目标及其阴影，从而生成具有自然局部光照的合成图像。
