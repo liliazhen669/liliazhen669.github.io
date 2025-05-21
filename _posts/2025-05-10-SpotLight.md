@@ -32,6 +32,16 @@ math: true
 
 （RGB -> X） 和 (Zerocomp) 证明了可以给定本征map（比如材质：albedo，roughness，matallic；几何：surface normals or depth 以及 shading），通过扩散模型来生成图像。作者将这类条件生成模型称为'扩散渲染器'。
 
+去噪网络 $\mathcal{R}$ 在每一去噪时间步 $t$ 计算得到：
+
+$$
+\begin{equation}
+\mathbf{v}_t=\mathcal{R}(\mathbf{\tilde{z}}_t,\mathbf{i},t),
+\end{equation}
+$$
+
+其中 $\mathbf{v}_t$ 表示 $v-$预测， $\mathbf{\tilde{z}}_t$ 表示时刻 $t$ 的噪声编码， 以及 $\mathbf{i}$ 表示作为条件的本征map。
+
 实验证明，这些方法能够以零样本的方式，将虚拟物体真实地合成到图像中，即使没有经过此任务的训练。只要提供虚拟物体的掩码及其本质map（由图形着色器渲染），就可以将该物体轻松地合成到背景图像的大多数本质map中（本质map是由经过训练的估计器预测的）。由于计算虚拟物体的阴影需要复杂的光照模拟，因此扩散方法通过提供部分shading map (Zerocomp) 来估计阴影，或训练修复模型（RGB -> X）。然而，与传统渲染不同，这些方法无法控制光照条件。
 
 在本文中，作者使用了一个预训练的扩散渲染器，并展示了通过引入近似的引导阴影，来控制扩散模型以实现局部光照控制，类似于聚光灯围绕物体移动。下面是详述方法部分。
@@ -39,19 +49,27 @@ math: true
 ### Blending shadows
 
 为了将引导阴影融入到隐表示中，需要将隐空间中每一时间步的噪声编码 $z_{t}$ 进行更新 (更新策略类似于(Blended latent diffusion 2023))：
+
 $$
+\begin{equation}
 \mathbf{\tilde{z}}_t=(1-\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathbf{z}_t+(\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathrm{noise}(\mathcal{E}(\mathbf{g}),t)
+\end{equation}
 $$
+
 更新后的 $\mathbf{\tilde{z}_t}$ 作为一种软约束，用于引导去噪过程以达到阴影一致的输出。在上述公式中，$\mathbf{g}$ 表示对象albedo，目标阴影和背景的合成，以及 $\beta$ 用于控制引导阴影的条件强度。$\mathbf{m}_{\mathrm{shw},\downarrow}$ 表示由目标掩码 $\mathbf{m}_{\mathrm{shw}}$ 下采样到隐空间得到隐空间中的阴影掩码。
 
 ### Shading the object via dual-branch guidance
 
 本文方法的一个关键要素是通过CFG来放大引导阴影对object shading的影响。具体地，会处理两个扩散分支：融入desired shadow方向的正分支和压制undesired shadow方向的负分支（比如，通过一个相反的光照方向）。如图2所示，CFG机制会将这两个分支进行组合：
+
 $$
+\begin{equation}
 \mathbf{\tilde{v}}_t=(1-\mathbf{m}_{\mathrm{obj},\downarrow})\odot\mathbf{v}_{t,\mathrm{pos}} +\mathbf{m}_{\mathrm{obj},\downarrow}\odot\left(\mathbf{v}_{t,\mathrm{neg}}+\gamma\left(\mathbf{v}_{t,\mathrm{pos}}-\mathbf{v}_{t,\mathrm{neg}}\right)\right),
+\end{equation}
 $$
+
 其中 $\gamma$ 用来设置引导scale。这种双分支策略会强制物体上的预期照明，同时将其与背景自然融合
 
-###  Final image synthesi
+###  Final image synthesis
 
 引导扩散过程结束后，使用 VAE 解码器对生成的潜变量进行解码。采用 (Zerocomp) 中的背景保留策略，确保仅修改目标及其阴影，从而生成具有自然局部光照的合成图像。
