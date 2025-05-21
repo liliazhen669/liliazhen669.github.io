@@ -39,7 +39,7 @@ math: true
 
 ## Method
 
-![fig-1](assets/img/lbm/fig1.png)
+![fig-2](assets/img/lbm/fig2.png)
 
 ### Bridge Matching
 
