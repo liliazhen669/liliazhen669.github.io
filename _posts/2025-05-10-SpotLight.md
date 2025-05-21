@@ -52,11 +52,11 @@ $$
 
 $$
 \begin{equation}
-\mathbf{\tilde{z}}_t=(1-\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathbf{z}_t+(\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathrm{noise}(\mathcal{E}(\mathbf{g}),t)
+\mathbf{\tilde{z}}_t=(1-\beta\mathbf{m}_{\mathrm{shw} \downarrow})\odot\mathbf{z}_t+(\beta\mathbf{m}_{\mathrm{shw},\downarrow})\odot\mathrm{noise}(\mathcal{E}(\mathbf{g}),t)
 \end{equation}
 $$
 
-更新后的 $\mathbf{\tilde{z}_t}$ 作为一种软约束，用于引导去噪过程以达到阴影一致的输出。在上述公式中，$\mathbf{g}$ 表示对象albedo，目标阴影和背景的合成，以及 $\beta$ 用于控制引导阴影的条件强度。$\mathbf{m}_{\mathrm{shw},\downarrow}$ 表示由目标掩码 $\mathbf{m}_{\mathrm{shw}}$ 下采样到隐空间得到隐空间中的阴影掩码。
+更新后的 $\tilde{z}_{t}$ 作为一种软约束，用于引导去噪过程以达到阴影一致的输出。在上述公式中，$\mathbf{g}$ 表示对象albedo，目标阴影和背景的合成，以及 $\beta$ 用于控制引导阴影的条件强度。$m_{shw \downarrow}$ 表示由目标掩码 $m_{shw}$ 下采样到隐空间得到隐空间中的阴影掩码。
 
 ### Shading the object via dual-branch guidance
 
