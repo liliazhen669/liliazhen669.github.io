@@ -235,3 +235,5 @@ denoised_sample = noisy_sample - prediction * sigmas
 <p align="center">
   <img src="https://picx.zhimg.com/v2-57d314e3c3f85b362586d8c903ebfbd3_1440w.jpg" alt="LBM Teaser" width="800"/>
 </p>
+
+> 参考链接：*[LBM基于桥匹配的单步推理图像翻译（包含重光照、阴影生成、物体移除）](https://zhuanlan.zhihu.com/p/29691836741)*
