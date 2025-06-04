@@ -35,8 +35,9 @@ math: true
 每一个（appearance video）外观视频 $\mathcal{V}_{\mathrm{appr}}\in\mathbb{R}^{f\times h\times w\times3}$ 与6个增强数据配对以促进光照建模（RelightVid 是5个）： 
 
 $$
-\mathcal{V}_{\mathrm{appr}}\leftrightarrow\{\mathcal{V}_{\mathrm{ref}},\mathcal{V}_{\mathrm{bg}},\mathcal{V}_{\mathrm{hdr}},\mathcal{V}_{\mathrm{geo}},\mathcal{V}_{\mathrm{mask}},\mathcal{C}},
+\mathcal{V}_{\mathrm{appr}}\leftrightarrow {\mathcal{V}_{\mathrm{ref}},\mathcal{V}_{\mathrm{bg}},\mathcal{V}_{\mathrm{hdr}},\mathcal{V}_{\mathrm{geo}},\mathcal{V}_{\mathrm{mask}},\mathcal{C}},
 $$
+
 其中 $\mathcal{V}_{\mathrm{mask}} \in \mathbb{R}^{T \times H \times W \times 3}$，（这与RelightVid的Mask的通道数不一样）$T$ 表示帧数，$W$ 表示视频的宽，$H$ 表示视频的高。
 
 **HDR Environment Maps.** 由于HDR maps可以进行准确的基于图像的照明，本文利用DiffusionLight 来提取这些HDR maps。然而，由于DiffusionLight是为单张图像设计的，如果对每一帧视频独立应用该方法，会导致严重的时间不一致性，即合成的铬球在不同帧之间往往变化很大。为保证时间上的稳定性，本文仅从每个视频的第一帧提取铬球图像，然后将这一初始铬球直接复制到后续所有帧，从而在整个序列中获得时间连贯的HDR视频 $\mathcal{V}_{\mathrm{hdr}}$。
