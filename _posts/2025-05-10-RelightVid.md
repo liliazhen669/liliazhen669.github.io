@@ -75,9 +75,11 @@ $$
 
 每一个（appearance video）外观视频 $\mathcal{V}_{\mathrm{appr}}\in\mathbb{R}^{f\times h\times w\times3}$ 与五种增强数据配对以促进光照建模： 
 
-$$\mathcal{V}_{\mathrm{appr}}\leftrightarrow\{\mathcal{V}_{\mathrm{rel}},\mathcal{V}_{\mathrm{bg}},E,\mathcal{T},\mathcal{M}\},$$
+$$
+\mathcal{V}_{\mathrm{appr}}\leftrightarrow\{\mathcal{V}_{\mathrm{rel}},\mathcal{V}_{\mathrm{bg}},E,\mathcal{T},\mathcal{M}\},
+$$
 
-其中 $\mathcal{V}_{\mathrm{rel}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示重光照后的前景视频， $\mathcal{V}_{\mathrm{bg}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示背景视频， $\mathrm{E} \in\mathbb{R}^{f\times 32 \times 32 \times 3}$ 表示卷积后的时间环境图，\mathcal{T} 表示光照变化的文本描述以及 $\mathcal{M}\in\mathbb{R}^{f\times h \times w}$ 表示前景掩码。
+其中 $\mathcal{V}_{\mathrm{rel}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示重光照后的前景视频，$\mathcal{V}_{\mathrm{bg}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示背景视频， $\mathrm{E} \in\mathbb{R}^{f\times 32 \times 32 \times 3}$ 表示卷积后的时间环境图，\mathcal{T} 表示光照变化的文本描述以及 $\mathcal{M}\in\mathbb{R}^{f\times h \times w}$ 表示前景掩码。
 
 给定真实世界的视频 $\mathcal{V}_{\mathrm{appr}}$ ， 由2D的重光照模型 IC-Light 逐帧进行打光得到增强后的在不同光照条件下的重光照前景视频 $\mathcal{V}_{\mathrm{rel}}$ 。然后分别使用 InSPyReNet 以及 ProPainter 获得前景掩码 $\mathcal{M}$ 以及补齐后的背景视频 $\mathcal{V}_\mathrm{bg}$ 。而HDR环境图则使用 DiffusionLight 从 $\mathcal{V}_\mathrm{appr}$ 中提取以及通过temporal convolution后得到。除此之外，还是用 GPT-4V对视频的环境以及光照细节进行达标，以及进一步进行过滤后得到大约20K的高质量原视频数据。
 
