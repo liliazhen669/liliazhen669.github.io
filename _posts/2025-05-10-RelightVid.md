@@ -73,13 +73,13 @@ $$
 
 ###  LightAtlas Data Collection Pipeline
 
-每一个（appearance video）外观视频 $\mathcal{V}_\mathrm{appr~}\in\mathbb{R}^{f\times h\times w\times3}$ 与五种增强数据配对以促进光照建模： 
+每一个（appearance video）外观视频 $\mathcal{V}_{\mathrm{appr}}\in\mathbb{R}^{f\times h\times w\times3}$ 与五种增强数据配对以促进光照建模： 
 
 $$\mathcal{V}_{\mathrm{appr}}\leftrightarrow\{\mathcal{V}_{\mathrm{rel}},\mathcal{V}_{\mathrm{bg}},E,\mathcal{T},\mathcal{M}\},$$
 
-其中 $\mathcal{V}_\mathrm{rel}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示重光照后的前景视频， $\mathcal{V}_\mathrm{bg}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示背景视频， $\mathrm{E} \in\mathbb{R}^{f\times 32 \times 32 \times 3}$ 表示卷积后的时间环境图，\mathcal{T} 表示光照变化的文本描述以及 $\mathcal{M}\in\mathbb{R}^{f\times h \times w}$ 表示前景掩码。
+其中 $\mathcal{V}_{\mathrm{rel}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示重光照后的前景视频， $\mathcal{V}_{\mathrm{bg}}\in\mathbb{R}^{f\times h\times w \times 3}$ 表示背景视频， $\mathrm{E} \in\mathbb{R}^{f\times 32 \times 32 \times 3}$ 表示卷积后的时间环境图，\mathcal{T} 表示光照变化的文本描述以及 $\mathcal{M}\in\mathbb{R}^{f\times h \times w}$ 表示前景掩码。
 
-给定真实世界的视频 $\mathcal{V}_\mathrm{appr}$ ， 由2D的重光照模型 IC-Light 逐帧进行打光得到增强后的在不同光照条件下的重光照前景视频 $\mathcal{V}_\mathrm{rel}$ 。然后分别使用 InSPyReNet 以及 ProPainter 获得前景掩码 $\mathcal{M}$ 以及补齐后的背景视频 $\mathcal{V}_\mathrm{bg}$ 。而HDR环境图则使用 DiffusionLight 从 $\mathcal{V}_\mathrm{appr}$ 中提取以及通过temporal convolution后得到。除此之外，还是用 GPT-4V对视频的环境以及光照细节进行达标，以及进一步进行过滤后得到大约20K的高质量原视频数据。
+给定真实世界的视频 $\mathcal{V}_{\mathrm{appr}}$ ， 由2D的重光照模型 IC-Light 逐帧进行打光得到增强后的在不同光照条件下的重光照前景视频 $\mathcal{V}_{\mathrm{rel}}$ 。然后分别使用 InSPyReNet 以及 ProPainter 获得前景掩码 $\mathcal{M}$ 以及补齐后的背景视频 $\mathcal{V}_\mathrm{bg}$ 。而HDR环境图则使用 DiffusionLight 从 $\mathcal{V}_\mathrm{appr}$ 中提取以及通过temporal convolution后得到。除此之外，还是用 GPT-4V对视频的环境以及光照细节进行达标，以及进一步进行过滤后得到大约20K的高质量原视频数据。
 
 在增强数据对中，背景视频 $\mathcal{V}_\mathrm{bg}$ ，环境地图 $\mathrm{E}$ 和光照描述 $\mathcal{T}$ 被作为条件输入，重光照视频 $\mathcal{V}_\mathrm{rel}$ 作为模型输入，而真实世界的视频 $\mathcal{V}_\mathrm{appr}$ 则作为目标视频。因为 $\mathcal{V}_\mathrm{appr}$ 是从真实场景中获取，因此将 $\mathcal{V}_\mathrm{appr}$ 作为目标视频可以使得模型学习到真实的数据分布以及每帧之间的时间连贯性（temporal coherence）。虽然这部分数据具有很高的照片真实感，但某些输入光照条件，尤其是环境贴图（HDR），由于估算过程会引入噪声。为了提升HDR视频的精确光照条件，作者还引入了来自3D渲染引擎的辅助训练数据，以实现更精确的控制，并提升模型对多样化光照场景的鲁棒性。通过输入增强，包括亮度缩放和基于阴影的重光照处理，最终生成了20万对高质量的视频编辑样本。
  
