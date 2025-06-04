@@ -52,8 +52,22 @@ $$
 
 ![fig-3](assets/img/illumicraft/fig3.png)
 
-**Latent Feature Extraction.**首先从背景视频提取第一帧作为参考图 $\mathcal{I}_{\mathrm{ref}} \in \mathbf{R}^{H \times W \times 3}$，然后对其在时间轴上做零填充以得到参考视频 $\mathcal{V}_{\mathrm{ref}} \in \mathbb{R}^{T \times H \times W \times 3}$
+**Latent Feature Extraction.**首先从背景视频提取第一帧作为参考图 
+$\mathcal{I}_{\mathrm{ref}} \in \mathbf{R}^{H \times W \times 3}$，
+然后对其在时间轴上做零填充以得到参考视频 
+$\mathcal{V}_{\mathrm{ref}} \in \mathbb{R}^{T \times H \times W \times 3}$
 
-**Inject Illumination Control.**为了从HDR maps中得到光照线索（illumination cues），首先利用一个compact MLP作为Encoder，将HDR视频 $\mathcal{V}_{\mathrm{hdr}}$ 输入后得到一个特征矩阵 $\mathcal{X}_{\mathrm{hdr}} \in \mathbb{R}^{N \times D}$ 。然后引入可学习的illumination embedding $\mathcal{X} \in \mathbb{R}^{N \times D}$ 进行更新：$\mathcal{X} \leftarrow \mathcal{X} + \mathcal{X}_{\mathrm{hdr}}$ 。此外，还将 $\mathcal{X}$ 和文本嵌入 $\mathbb{P} \in \mathbb{R}^{N \times D}$ 进行相加得到最终的光照控制条件 $\mathbb{P}' \in \mathbb{R}^{(N+L) \times D}$
+**Inject Illumination Control.**为了从HDR maps中得到光照线索（illumination cues），首先利用一个compact MLP作为Encoder，将HDR视频 
+$\mathcal{V}_{\mathrm{hdr}}$ 
+输入后得到一个特征矩阵 
+$\mathcal{X}_{\mathrm{hdr}} \in \mathbb{R}^{N \times D}$ 
+。然后引入可学习的illumination embedding 
+$\mathcal{X} \in \mathbb{R}^{N \times D}$ 
+进行更新：
+$\mathcal{X} \leftarrow \mathcal{X} + \mathcal{X}_{\mathrm{hdr}}$ 
+。此外，还将 
+$\mathcal{X}$ 和文本嵌入 $\mathbb{P} \in \mathbb{R}^{N \times D}$ 
+进行相加得到最终的光照控制条件 
+$\mathbb{P}' \in \mathbb{R}^{(N+L) \times D}$
 
 **Integrate 3D Geometry Guidance.** 扩展ControlNet且使用3D追踪视频 $\mathcal{V}_{\mathrm{geo}}$作为额外的控制信号。首先使用VAE得到一个隐变量，为了将控制信号诸如到DiT中，从DiT的预训练的32个transformer blocks中复制前4个blocks：将这四个块的输出放入一个零初始化的线性层中，然后将经过线性层后的输出add到DiT的主流特征图中。
