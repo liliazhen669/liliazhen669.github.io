@@ -39,9 +39,9 @@ LayerFlow的Pipeline如figure 2所示，分别地给定对于不同目标层级�
 
 ### Training Pipeline   
 
-能够感知层的视频生成模型需要高质量的多层视频，这类视频往往难以获得或者构建。为了解决这个问题，本文提出了一个三阶段的训练策略，结合了静态图像和动态视频数据，利用了运动以及内容LoRA来解决数据稀缺这一问题，能够显著改进视频的内层连贯性，没血质量以及运动动态（inter-layer coherence，aesthetic quality, and motion dynamics）。
+能够感知层的视频生成模型需要高质量的多层视频，这类视频往往难以获得或者构建。为了解决这个问题，本文提出了一个三阶段的训练策略，结合了静态图像和动态视频数据，利用了运动以及内容LoRA来解决数据稀缺这一问题，能够显著改进视频的内层连贯性，美学质量以及运动动态（inter-layer coherence，aesthetic quality, and motion dynamics）。
 
-第一阶段：基模型训练。本文首先在一个低质量多层视频数据集上进行基模型的训练以赋予视频生成模型初始的层感知生成能力。在 $\matmrm{MSE}$ 损失的驱动下，去噪网络 $\epsilon_{\thheta}$ 学习预测噪声：
+第一阶段：基模型训练。本文首先在一个低质量多层视频数据集上进行基模型的训练以赋予视频生成模型初始的层感知生成能力。在 $\mathrm{MSE}$ 损失的驱动下，去噪网络 $\epsilon_{\theta}$ 学习预测噪声：
 
 $$
 \begin{equation}
