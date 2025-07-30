@@ -14,7 +14,7 @@ math: true
 
 ## Abstract
 
-## Physically Controllable RelightingPhysically Controllable Relighting
+## Physically Controllable Relighting
 
 ![fig-2](assets/img/physically/fig2.png)
 
