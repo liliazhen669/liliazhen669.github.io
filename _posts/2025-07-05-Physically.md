@@ -51,7 +51,7 @@ D = A \times S ,
 \end{equation}
 $$
 
-**Unknown variables.** 不如一般性，本文将未知的 3D 光照环境 $\Psi$ 表示为环境照明 $E$ 和一组点光源 $\mathcal{P}=\{\vec{p}_{i}|i\in\{1,2,...,K\}\}{:}$ 
+**Unknown variables.** 不失一般性，本文将未知的 3D 光照环境 $\Psi$ 表示为环境照明 $E$ 和一组点光源 $\mathcal{P} = \{ \vec{p}_i \mid i \in \{1, 2, \dots, K\} \}$ 
 
 $$
 \begin{equation}
@@ -60,3 +60,34 @@ $$
 $$
 
 其中 $E$ 是高动态范围图（HDRI）。点光源 $\vec{p}_{i} \in \mathbb{R}^{6}$ 被定义为非负 RGB 强度与不受约束的 3D 位置的 concatenation。
+
+**Objective function.**  目标是在 PBR 环境中使用 textured mesh $M$ ，通过最优化 3D 光照环境 $Psi$ 尽可能的重建 $D$，训练的目标函数可以定义如下：
+
+$$
+\begin{equation}
+e(D,M,\Psi)=\sum_{\forall i\in\mathcal{V}}\sum_{\{r,g,b\}}\left(D_i-\mathrm{pbr}(M,\Psi)_i\right)^2,
+\end{equation}
+$$
+
+其中 $\mathrm{pbr}(M, \Psi)$ 表示基于物理的渲染操作，以及 $\mathcal{V}$ 是渲染中的合法像素组，但不包括单目几何估计产生的空洞。
+
+**Optimization.** 
+
+
+### Neural renderer
+
+流程的最后一步是前馈神经渲染器 (NR)，它模拟初始渲染 $\tilde {D}$ 与真实世界外观之间的差距。给定图像 $𝐼$，首先生成场景的光照不变的 3D 表示，然后在 CG 光照下进行渲染。使用漫反射图像 $𝐷$ 作为目标变量，生成与环境中原始光照最接近的 PBR 近似值。$𝐼$ 本身作为真实世界外观的 ground-truth。利用物理建模为 NR 生成光照相关的输入，从而有效地将其与 $𝐼$ 中的现有光照分离。光照变量 $𝐼$ 和 $𝐷$ 仅用作 NR 或 PBR 的目标变量。
+
+**Input and losses.** 
+
+初次渲染 $\tilde {D}$ 能够反映目标光照条件，但缺乏细节。为了能够让网络保持原始场景内容的高保真度，还将 diffuse reflectance $A$ 作为输入。如上一节中提到的，由于不完整的 geometry 会导致在 PBR 结果中丢失部分像素，为此使用了一个 low-level hole 来进行填充，以清除 $\tilde {D}$ 中的一些高频伪影，且将一个非合法像素的二值掩码 $\mathcal{V}^{c}$ 作为输入。最后将 $D, A, \mathcal{V}^{c}$ 在通道维度上进行相加以得到一个 7-通道数的 map 来作为 NR 的输入。
+
+NR 的输入结果 $\hat{I}$ 被定义在线性RGB空间中的真实世界的重光照结果。使用原始图像 $I$ 作为输入，损失函数结合了多尺度梯度损失以及MSE重建损失，整个损失函数定义如下：
+
+$$
+\begin{equation}
+\mathcal{L}=MSE(I,\tilde{I})+\sum_\boldsymbol{m}MSE(\nabla I^\boldsymbol{m},\nabla\tilde{I}^\boldsymbol{m}),
+\end{equation}
+$$
+
+其中 $\nabla I^\boldsymbol{m}$ 表示输入图像 $I$ 在尺度 $m$ 下的梯度。
